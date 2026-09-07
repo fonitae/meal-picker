@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>吃什么？</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fef3e2 0%, #fde0c0 50%, #fcd0a0 100%);
+            --card-bg: #ffffff;
+            --text: #3d2e1f;
+            --text-muted: #a08a72;
+            --primary: #e8953a;
+            --primary-dark: #d47e24;
+            --primary-fg: #fffaf5;
+            --accent: #fdf0e0;
+            --accent-dark: #f0dcc0;
+            --border: #f0e4d3;
+            --success: #7bae5a;
+            --success-dark: #5d8f3d;
+            --danger: #e07060;
+            --danger-dark: #c45448;
+            --card-radius: 24px;
+            --btn-radius: 16px;
+            --pill-radius: 999px;
+            --shadow-card: 0 8px 32px rgba(232, 149, 58, 0.18);
+            --shadow-btn: 0 4px 12px rgba(232, 149, 58, 0.3);
+            --font-display: 'STKaiti', 'KaiTi', '楷体', serif;
+            --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            height: 100%;
+        }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+        }
+        .app-card {
+            background: var(--card-bg);
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow-card);
+            width: 100%;
+            max-width: 440px;
+            padding: 32px 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===== 标题行 ===== */
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: nowrap;
+            font-family: var(--font-display);
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: .03em;
+            line-height: 1.35;
+            gap: 2px;
+        }
+        .title-row .prefix,
+        .title-row .suffix {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .title-select-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin: 0 2px;
+        }
+        .title-select {
+            appearance: none;
+            -webkit-appearance: none;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            background: rgba(232, 149, 58, 0.08);
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            padding: 2px 30px 4px 12px;
+            cursor: pointer;
+            outline: none;
+            letter-spacing: .03em;
+            line-height: 1.3;
+            text-align: center;
+            transition: all .2s;
+            min-width: 100px;
+        }
+        .title-select:hover {
+            border-bottom-color: var(--primary-dark);
+            color: var(--primary-dark);
+            background: rgba(232, 149, 58, 0.14);
+            border-color: var(--primary-dark);
+        }
+        .title-select:focus {
+            border-style: solid;
+            border-color: var(--primary-dark);
+            background: rgba(232, 149, 58, 0.1);
+        }
+        .title-select option {
+            font-family: var(--font-body);
+            font-size: 16px;
+            color: var(--text);
+            background: #fff;
+            padding: 6px;
+        }
+        .title-select-arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 13px;
+            color: var(--primary);
+            transition: color .2s;
+        }
+        .title-select:hover~.title-select-arrow,
+        .title-select:focus~.title-select-arrow {
+            color: var(--primary-dark);
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* ===== 展示区域 ===== */
+        .display-area {
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            background: linear-gradient(180deg, #fffbf5 0%, #fff8ef 100%);
+            min-height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px 16px;
+            transition: all .3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .display-area.locked {
+            border-color: var(--primary);
+            border-style: solid;
+            background: linear-gradient(180deg, #fffaf0 0%, #fff5e3 100%);
+            box-shadow: inset 0 0 20px rgba(232, 149, 58, .1);
+        }
+        .display-placeholder {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+        .display-placeholder .icon {
+            font-size: 44px;
+            display: block;
+            margin-bottom: 10px;
+            animation: floaty 3s ease-in-out infinite;
+        }
+        @keyframes floaty {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+        .display-rolling {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: .02em;
+        }
+        .display-rolling .hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 400;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        .display-result {
+            animation: popIn .4s cubic-bezier(.16, 1.5, .3, 1);
+        }
+        .display-result .label {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 400;
+        }
+        .display-result .food {
+            font-size: 44px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: var(--font-display);
+            letter-spacing: .04em;
+            text-shadow: 0 2px 8px rgba(232, 149, 58, .2);
+        }
+        .display-result .emoji {
+            font-size: 28px;
+            margin-top: 8px;
+            animation: bounce .6s ease .2s both;
+        }
+        @keyframes popIn {
+            0% {
+                transform: scale(.6);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.08);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-8px);
+            }
+            70% {
+                transform: translateY(-3px);
+            }
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: .5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ===== 按钮 ===== */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+            border-radius: var(--btn-radius);
+            font-family: var(--font-body);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            padding: 14px 20px;
+            flex: 1;
+            min-height: 52px;
+        }
+        .btn:active {
+            transform: scale(.96);
+        }
+        .btn-start {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--primary-fg);
+            box-shadow: var(--shadow-btn);
+        }
+        .btn-stop {
+            background: linear-gradient(135deg, #f08070 0%, var(--danger-dark) 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(224, 112, 96, .35);
+        }
+        .btn-confirm {
+            background: linear-gradient(135deg, #9bc67e 0%, var(--success-dark) 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(123, 174, 90, .3);
+        }
+        .btn-confirm:disabled {
+            background: #e8dfd0;
+            color: #b5a690;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-menu-wrap {
+            text-align: center;
+        }
+        .btn-menu {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border);
+            border-radius: var(--pill-radius);
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-menu:hover {
+            background: var(--accent);
+            color: var(--text);
+            border-color: var(--accent-dark);
+        }
+
+        /* ===== 弹窗遮罩 ===== */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(61, 46, 31, .35);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn .25s ease;
+        }
+        .overlay.hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .dialog {
+            background: var(--card-bg);
+            border-radius: var(--card-radius) var(--card-radius) 0 0;
+            width: 100%;
+            max-width: 460px;
+            padding: 24px 18px 28px;
+            animation: slideUp .35s cubic-bezier(.16, 1, .3, 1);
+            max-height: 82vh;
+            overflow-y: auto;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: .5;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .menu-group {
+            margin-bottom: 18px;
+            background: #fffcf7;
+            border-radius: 16px;
+            padding: 14px 12px 14px;
+            border: 1px solid var(--border);
+        }
+        .menu-group:last-child {
+            margin-bottom: 0;
+        }
+        .menu-group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 4px 10px;
+            border-bottom: 1px dashed var(--border);
+            margin-bottom: 10px;
+        }
+        .menu-group-header .icon {
+            font-size: 20px;
+        }
+        .menu-group-header .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            flex: 1;
+        }
+        .menu-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: var(--primary-dark);
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 36px;
+            height: 20px;
+            border-radius: 10px;
+            padding: 0 8px;
+            flex-shrink: 0;
+        }
+
+        /* ===== 菜单水平列表 ===== */
+        .menu-list {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .menu-item {
+            flex: 1;
+            flex-basis: 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 8px 10px;
+            border-radius: 12px;
+            background: var(--accent);
+            font-size: 14px;
+            position: relative;
+            animation: fadeSlideIn .3s ease both;
+            border: 1px solid transparent;
+            transition: all .15s;
+        }
+        .menu-item:hover {
+            background: #fdf5e8;
+            border-color: var(--accent-dark);
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .menu-item .food-name {
+            color: var(--primary-dark);
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.3;
+            text-align: center;
+            width: 100%;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-all;
+            padding: 0 4px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-item .food-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .btn-delete {
+            flex-shrink: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(224, 112, 96, .12);
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+            line-height: 1;
+            padding: 0;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+        }
+        .btn-delete:hover {
+            background: var(--danger);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .btn-delete:active {
+            transform: scale(.95);
+        }
+        .menu-empty {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 8px 14px;
+            text-align: center;
+            flex: 1;
+        }
+
+        /* ===== 关闭按钮 ===== */
+        .dialog-close {
+            display: block;
+            width: 100%;
+            margin-top: 18px;
+            padding: 13px;
+            border-radius: var(--btn-radius);
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 15px;
+            font-family: var(--font-body);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .dialog-close:hover {
+            background: var(--accent);
+            color: var(--text);
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 22px;
+            border-radius: var(--pill-radius);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 200;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+            animation: toastIn .3s cubic-bezier(.16, 1, .3, 1), toastOut .3s ease 1.7s forwards;
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .toast.success {
+            background: linear-gradient(135deg, #a8d08a 0%, var(--success-dark) 100%);
+            color: #fff;
+        }
+        .toast.warn {
+            background: linear-gradient(135deg, #f0c878 0%, #d49e30 100%);
+            color: #fff;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-8px);
+            }
+        }
+
+        /* ===== 响应式 ===== */
+        @media(min-width:640px) {
+            .app-card {
+                padding: 40px 36px 32px;
+                max-width: 480px;
+            }
+            .title-row {
+                font-size: 36px;
+            }
+            .title-select {
+                font-size: 34px;
+                min-width: 120px;
+                padding: 2px 34px 4px 14px;
+            }
+            .display-area {
+                min-height: 190px;
+                padding: 32px 20px;
+            }
+            .display-rolling {
+                font-size: 46px;
+            }
+            .display-result .food {
+                font-size: 54px;
+            }
+            .btn {
+                font-size: 17px;
+                padding: 16px 20px;
+                min-height: 56px;
+            }
+            .overlay {
+                align-items: center;
+                padding: 20px;
+            }
+            .dialog {
+                border-radius: var(--card-radius);
+                animation: scaleIn .3s cubic-bezier(.16, 1, .3, 1);
+                max-width: 480px;
+                padding: 24px 20px 28px;
+            }
+            .menu-item .food-name {
+                font-size: 15px;
+            }
+            .menu-item .food-time {
+                font-size: 11px;
+            }
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(.92);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        @media(max-width:380px) {
+            .title-row {
+                font-size: 24px;
+            }
+            .title-select {
+                font-size: 22px;
+                min-width: 80px;
+                padding: 2px 24px 4px 8px;
+            }
+            .title-select-arrow {
+                right: 6px;
+                font-size: 11px;
+            }
+            .display-rolling {
+                font-size: 30px;
+            }
+            .display-result .food {
+                font-size: 36px;
+            }
+            .menu-item .food-name {
+                font-size: 12px;
+                min-height: 30px;
+            }
+            .menu-item .food-time {
+                font-size: 9px;
+            }
+            .menu-group {
+                padding: 10px 8px;
+            }
+            .menu-list {
+                gap: 5px;
+            }
+            .menu-item {
+                padding: 10px 5px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-card">
+        <div>
+            <div class="title-row">
+                <span class="prefix">今天</span>
+                <span class="title-select-wrap">
+                    <select class="title-select" id="mealSelect" aria-label="选择时段">
+                        <option value="breakfast">早餐</option>
+                        <option value="lunch">午餐</option>
+                        <option value="dinner">晚餐</option>
+                    </select>
+                    <span class="title-select-arrow">▾</span>
+                </span>
+                <span class="suffix">什么？</span>
+            </div>
+            <p class="subtitle">随机帮你决定，告别选择困难</p>
+        </div>
+        <div class="display-area" id="displayArea">
+            <div class="display-placeholder" id="placeholder">
+                <span class="icon" id="placeholderIcon">🌅</span>
+                选好时段，点「开始滚动」随机吧~
+            </div>
+            <div class="display-rolling" id="rolling" style="display:none">
+                <div id="rollingText"></div>
+                <div class="hint">滚动中...</div>
+            </div>
+            <div class="display-result" id="result" style="display:none">
+                <div class="label" id="resultLabel"></div>
+                <div class="food" id="resultFood"></div>
+                <div class="emoji">🎉</div>
+            </div>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-start" id="btnRoll"><span>▶</span> 开始滚动</button>
+            <button class="btn btn-confirm" id="btnConfirm" disabled><span>✓</span> 就选他了</button>
+        </div>
+        <div class="btn-menu-wrap">
+            <button class="btn-menu" id="btnMenu"><span>📋</span> 看看菜单</button>
+        </div>
+    </div>
+    <div class="overlay hidden" id="overlay">
+        <div class="dialog" id="dialog">
+            <div class="dialog-header"><span>📋</span><span>我的菜单</span><span>📋</span></div>
+            <div id="menuContent"></div>
+            <button class="dialog-close" id="btnClose">关闭</button>
+        </div>
+    </div>
+    <script>
+        (function() {
+            'use strict';
+            // ===== 菜品池 — 改这里即可 =====
+            var BREAKFAST_POOL = ['豆浆油条', '包子粥', '肠粉', '煎饼果子', '三明治', '牛奶麦片', '鸡蛋灌饼', '肉夹馍', '馄饨', '小笼包', '豆腐脑', '热干面',
+                '皮蛋瘦肉粥', '葱油拌面', '鸡蛋饼', '糯米鸡', '烧麦', '胡辣汤'
+            ];
+            var LUNCH_POOL = ['黄焖鸡米饭', '兰州拉面', '沙县小吃', '盖浇饭', '麻辣烫', '螺蛳粉', '重庆小面', '酸菜鱼', '宫保鸡丁饭', '红烧肉饭', '番茄牛腩饭', '扬州炒饭',
+                '日式咖喱饭', '韩式拌饭', '汉堡套餐', '披萨', '饺子', '馄饨面', '煲仔饭', '隆江猪脚饭', '烧腊饭', '云吞面', '牛肉饭', '鸡排饭'
+            ];
+            var DINNER_POOL = ['火锅', '烧烤', '小龙虾', '烤鱼', '水煮鱼', '酸菜鱼', '潮汕牛肉火锅', '椰子鸡', '猪肚鸡', '焖锅', '干锅牛蛙', '麻辣香锅', '寿司', '韩式烤肉',
+                '部队锅', '泰式冬阴功', '越南河粉', '意大利面', '牛排', '烤鸭', '煲仔饭', '砂锅粥', '打边炉', '家常菜'
+            ];
+            var POOLS = { breakfast: BREAKFAST_POOL, lunch: LUNCH_POOL, dinner: DINNER_POOL };
+            var ICONS = { breakfast: '🌅', lunch: '☀️', dinner: '🌙' };
+            var LABELS = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐' };
+            var STORAGE_KEY = '__meal_picker_v3';
+            var MAX_PER_MEAL = 3;
+            var currentMeal = getDefaultMealType();
+            var isRolling = false,
+                rollTimer = null,
+                confirmedResult = null;
+            var savedChoices = loadChoices();
+            var $ = function(id) { return document.getElementById(id) };
+            var $mealSelect = $('mealSelect'),
+                $displayArea = $('displayArea'),
+                $placeholder = $('placeholder'),
+                $placeholderIcon = $('placeholderIcon'),
+                $rolling = $('rolling'),
+                $rollingText = $('rollingText'),
+                $result = $('result'),
+                $resultLabel = $('resultLabel'),
+                $resultFood = $('resultFood'),
+                $btnRoll = $('btnRoll'),
+                $btnConfirm = $('btnConfirm'),
+                $btnMenu = $('btnMenu'),
+                $overlay = $('overlay'),
+                $dialog = $('dialog'),
+                $menuContent = $('menuContent'),
+                $btnClose = $('btnClose');
+
+            function getDefaultMealType() {
+                var h = new Date().getHours();
+                if (h >= 5 && h < 10) return 'breakfast';
+                if (h >= 10 && h < 15) return 'lunch';
+                return 'dinner';
+            }
+
+            function loadChoices() {
+                var empty = { breakfast: [], lunch: [], dinner: [] };
+                try {
+                    var raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return empty;
+                    var parsed = JSON.parse(raw);
+                    ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
+                        var arr = parsed[key];
+                        if (Array.isArray(arr)) {
+                            empty[key] = arr.filter(function(item) {
+                                return item && typeof item.food === 'string' && item.food;
+                            }).slice(0, MAX_PER_MEAL);
+                        } else if (typeof arr === 'string' && arr) {
+                            empty[key] = [{ food: arr, time: Date.now() }];
+                        }
+                    });
+                } catch (e) {}
+                return empty;
+            }
+
+            function saveChoices() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedChoices));
+                } catch (e) {}
+            }
+
+            function showToast(msg, type) {
+                type = type || 'success';
+                var el = document.createElement('div');
+                el.className = 'toast ' + type;
+                el.textContent = msg;
+                document.body.appendChild(el);
+                setTimeout(function() { el.remove(); }, 2100);
+            }
+
+            function formatTime(ts) {
+                var d = new Date(ts);
+                var p = function(n) { return n < 10 ? '0' + n : '' + n; };
+                return p(d.getMonth() + 1) + '/' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+            }
+
+            function escapeHTML(str) {
+                var div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function showPlaceholder() {
+                $placeholder.style.display = '';
+                $rolling.style.display = 'none';
+                $result.style.display = 'none';
+                $displayArea.classList.remove('locked');
+                $placeholderIcon.textContent = ICONS[currentMeal];
+            }
+
+            function showRolling(text) {
+                $placeholder.style.display = 'none';
+                $rolling.style.display = '';
+                $result.style.display = 'none';
+                $displayArea.classList.remove('locked');
+                $rollingText.textContent = text;
+            }
+
+            function showResult(food) {
+                $placeholder.style.display = 'none';
+                $rolling.style.display = 'none';
+                $result.style.display = '';
+                $displayArea.classList.add('locked');
+                $resultLabel.textContent = ICONS[currentMeal] + ' ' + LABELS[currentMeal] + '吃';
+                $resultFood.textContent = food;
+                $result.style.animation = 'none';
+                $result.offsetHeight;
+                $result.style.animation = '';
+            }
+
+            function updateRollButton() {
+                if (isRolling) {
+                    $btnRoll.innerHTML = '<span>⏹</span> 停止';
+                    $btnRoll.className = 'btn btn-stop';
+                } else {
+                    $btnRoll.innerHTML = '<span>▶</span> 开始滚动';
+                    $btnRoll.className = 'btn btn-start';
+                }
+            }
+
+            function updateConfirmButton() {
+                $btnConfirm.disabled = !(confirmedResult && !isRolling);
+            }
+
+            function startRolling() {
+                confirmedResult = null;
+                isRolling = true;
+                updateRollButton();
+                updateConfirmButton();
+                var pool = POOLS[currentMeal];
+                showRolling(pool[Math.floor(Math.random() * pool.length)]);
+                rollTimer = setInterval(function() {
+                    $rollingText.textContent = pool[Math.floor(Math.random() * pool.length)];
+                }, 70);
+            }
+
+            function stopRolling() {
+                if (rollTimer) {
+                    clearInterval(rollTimer);
+                    rollTimer = null;
+                }
+                isRolling = false;
+                updateRollButton();
+                var pool = POOLS[currentMeal];
+                confirmedResult = pool[Math.floor(Math.random() * pool.length)];
+                showResult(confirmedResult);
+                updateConfirmButton();
+            }
+
+            $btnRoll.addEventListener('click', function() {
+                if (isRolling) {
+                    stopRolling();
+                } else {
+                    startRolling();
+                }
+            });
+
+            $btnConfirm.addEventListener('click', function() {
+                if (!confirmedResult) return;
+                var list = savedChoices[currentMeal];
+                if (list.length >= MAX_PER_MEAL) {
+                    list.pop();
+                }
+                list.unshift({ food: confirmedResult, time: Date.now() });
+                saveChoices();
+                showToast('已保存：' + LABELS[currentMeal] + '吃 ' + confirmedResult + ' 🎉', 'success');
+                confirmedResult = null;
+                showPlaceholder();
+                updateConfirmButton();
+            });
+
+            $mealSelect.addEventListener('change', function() {
+                if (isRolling) {
+                    if (rollTimer) {
+                        clearInterval(rollTimer);
+                        rollTimer = null;
+                    }
+                    isRolling = false;
+                    updateRollButton();
+                }
+                currentMeal = $mealSelect.value;
+                confirmedResult = null;
+                showPlaceholder();
+                updateConfirmButton();
+            });
+
+            function renderMenu() {
+                var groups = [
+                    { type: 'breakfast', icon: '🌅', label: '早餐' },
+                    { type: 'lunch', icon: '☀️', label: '午餐' },
+                    { type: 'dinner', icon: '🌙', label: '晚餐' }
+                ];
+                var html = '';
+                groups.forEach(function(g) {
+                    var list = savedChoices[g.type] || [];
+                    html += '<div class="menu-group">';
+                    html += '<div class="menu-group-header">';
+                    html += '<span class="icon">' + g.icon + '</span>';
+                    html += '<span class="name">' + g.label + '吃</span>';
+                    html += '<span class="menu-badge">' + list.length + '/' + MAX_PER_MEAL + '</span>';
+                    html += '</div>';
+                    html += '<div class="menu-list">';
+                    if (list.length === 0) {
+                        html += '<div class="menu-empty">还没选哦~</div>';
+                    } else {
+                        list.forEach(function(entry, idx) {
+                            html += '<div class="menu-item" style="animation-delay:' + (idx * 40) + 'ms">';
+                            html += '<button class="btn-delete" data-meal="' + g.type +
+                                '" data-idx="' + idx + '" aria-label="删除">✕</button>';
+                            html += '<span class="food-name">' + escapeHTML(entry.food) + '</span>';
+                            html += '<span class="food-time">' + formatTime(entry.time) +
+                            '</span>';
+                            html += '</div>';
+                        });
+                    }
+                    html += '</div>';
+                    html += '</div>';
+                });
+                $menuContent.innerHTML = html;
+                $menuContent.querySelectorAll('.btn-delete').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        deleteMealItem(btn.getAttribute('data-meal'), parseInt(btn.getAttribute(
+                            'data-idx'), 10));
+                    });
+                });
+            }
+
+            function deleteMealItem(meal, idx) {
+                var list = savedChoices[meal];
+                if (!list || idx >= list.length) return;
+                var removed = list[idx].food;
+                list.splice(idx, 1);
+                saveChoices();
+                showToast('已删除：' + removed, 'warn');
+                renderMenu();
+            }
+
+            $btnMenu.addEventListener('click', function() {
+                renderMenu();
+                $overlay.classList.remove('hidden');
+                $dialog.scrollTop = 0;
+            });
+
+            function closeDialog() {
+                $overlay.classList.add('hidden');
+            }
+            $btnClose.addEventListener('click', closeDialog);
+            $overlay.addEventListener('click', function(e) {
+                if (e.target === $overlay) closeDialog();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !$overlay.classList.contains('hidden')) {
+                    closeDialog();
+                }
+            });
+
+            // 初始化
+            $mealSelect.value = currentMeal;
+            showPlaceholder();
+            updateConfirmButton();
+        })();
+    </script>
+</body>
+</html>
