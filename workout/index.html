@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2aa198">
+<title>今天练了什么</title>
+<style>
+  :root{
+    --bg: linear-gradient(165deg,#f0faf7 0%,#ddf2ec 45%,#cceae2 100%);
+    --card:#ffffff;
+    --text:#1f3d38;
+    --text-muted:#7a9a92;
+    --primary:#2aa198;
+    --primary-dark:#1e7a73;
+    --primary-light:#e5f5f3;
+    --accent:#f5a623;
+    --accent-dark:#d98a0a;
+    --accent-light:#fff4e0;
+    --danger:#e07060;
+    --danger-light:#fdeceb;
+    --border:#d8ebe6;
+    --radius-lg:22px;
+    --radius-md:16px;
+    --radius-sm:12px;
+    --shadow-card:0 8px 30px rgba(42,161,152,.13);
+    --shadow-btn:0 4px 14px rgba(42,161,152,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+    background:var(--bg);
+    background-attachment:fixed;
+    color:var(--text);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .screen{
+    position:fixed;
+    inset:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:var(--bg);
+    background-attachment:fixed;
+    transform:translateX(100%);
+    transition:transform .34s cubic-bezier(.4,0,.2,1);
+    z-index:10;
+    will-change:transform;
+  }
+  .screen.active{transform:translateX(0)}
+  .screen.home{transform:none;z-index:1}
+
+  /* ===== 首页 ===== */
+  .home-inner{
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    padding:32px 18px calc(28px + env(safe-area-inset-bottom));
+    max-width:520px;
+    margin:0 auto;
+    width:100%;
+  }
+  .home-header{
+    text-align:center;
+    margin-bottom:26px;
+  }
+  .header-top{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .home-title{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:.02em;
+    background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 60%,#3fbfb4 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    line-height:1.25;
+  }
+  .btn-top-summary{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:7px 12px;
+    border:none;
+    border-radius:999px;
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+    color:#fff;
+    font-size:11.5px;
+    font-weight:700;
+    font-family:inherit;
+    letter-spacing:.02em;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(42,161,152,.28);
+    white-space:nowrap;
+    transition:transform .16s;
+    flex-shrink:0;
+  }
+  .btn-top-summary:active{transform:scale(.94)}
+  .btn-top-summary .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:16px;
+    height:16px;
+    padding:0 5px;
+    border-radius:999px;
+    background:rgba(255,255,255,.3);
+    font-size:10px;
+    font-weight:800;
+    line-height:1;
+  }
+  .home-sub{
+    font-size:13px;
+    color:var(--text-muted);
+    margin-top:10px;
+    letter-spacing:.04em;
+  }
+
+  .exercise-list{display:flex;flex-direction:column;gap:18px}
+  .group-block{
+    background:var(--card);
+    border-radius:var(--radius-lg);
+    padding:16px 14px 14px;
+    box-shadow:var(--shadow-card);
+  }
+  .group-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:0 4px 12px;
+    border-bottom:1px dashed var(--border);
+    margin-bottom:12px;
+  }
+  .group-icon{font-size:19px;line-height:1}
+  .group-name{font-size:15px;font-weight:700;letter-spacing:.03em;flex:1}
+  .group-count{
+    font-size:11px;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:var(--primary-light);
+    padding:3px 9px;
+    border-radius:999px;
+    letter-spacing:.02em;
+  }
+  .group-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+    gap:8px;
+  }
+  .exercise-chip{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    min-height:48px;
+    padding:10px 8px;
+    border-radius:var(--radius-sm);
+    background:linear-gradient(180deg,#fbfefe 0%,#f4fbf9 100%);
+    border:1.5px solid var(--border);
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    cursor:pointer;
+    transition:all .16s ease;
+    line-height:1.3;
+    word-break:break-word;
+    user-select:none;
+  }
+  .exercise-chip:active{
+    transform:scale(.95);
+    background:var(--primary-light);
+    border-color:var(--primary);
+    color:var(--primary-dark);
+  }
+  .exercise-chip.has-pending{
+    border-color:var(--accent);
+    background:var(--accent-light);
+    color:#a0670a;
+    position:relative;
+  }
+  .exercise-chip.has-pending::after{
+    content:'';
+    position:absolute;
+    top:7px;right:7px;
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 2px #fff;
+  }
+
+  .home-footer{
+    margin-top:auto;
+    padding:24px 0 4px;
+    display:flex;
+    justify-content:center;
+  }
+  .btn-summary{
+    width:100%;
+    padding:16px 22px;
+    border:none;
+    border-radius:var(--radius-md);
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.05em;
+    box-shadow:var(--shadow-btn);
+    cursor:pointer;
+    transition:transform .16s;
+    font-family:inherit;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .btn-summary:active{transform:scale(.97)}
+  .btn-summary .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:22px;
+    height:22px;
+    padding:0 7px;
+    margin-left:8px;
+    border-radius:999px;
+    background:rgba(255,255,255,.25);
+    font-size:12px;
+    font-weight:800;
+  }
+
+  /* ===== 二级页通用 ===== */
+  .page-inner{
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    padding:0 18px calc(32px + env(safe-area-inset-bottom));
+    max-width:520px;
+    margin:0 auto;
+    width:100%;
+  }
+  .page-nav{
+    position:sticky;
+    top:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:18px 0 14px;
+    background:linear-gradient(180deg,rgba(240,250,247,1) 0%,rgba(240,250,247,1) 70%,rgba(240,250,247,0) 100%);
+    z-index:3;
+  }
+  .btn-back{
+    width:42px;height:42px;
+    flex-shrink:0;
+    border:none;
+    border-radius:50%;
+    background:#fff;
+    color:var(--text);
+    font-size:19px;
+    font-weight:600;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 2px 10px rgba(42,161,152,.12);
+    transition:all .16s;
+    font-family:inherit;
+    line-height:1;
+  }
+  .btn-back:active{transform:scale(.92);background:var(--primary-light)}
+  .page-title{
+    flex:1;
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:.02em;
+    text-align:center;
+  }
+  .nav-spacer{width:42px;flex-shrink:0}
+
+  /* ===== 动作详情页 ===== */
+  .recorder-card{
+    background:var(--card);
+    border-radius:var(--radius-lg);
+    padding:22px 18px 20px;
+    box-shadow:var(--shadow-card);
+    margin-bottom:20px;
+  }
+  .recorder-hint{
+    text-align:center;
+    font-size:12px;
+    color:var(--text-muted);
+    letter-spacing:.06em;
+    margin-bottom:14px;
+  }
+  .set-input-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    margin-bottom:20px;
+    font-size:16px;
+    font-weight:600;
+    color:var(--text);
+    flex-wrap:wrap;
+  }
+  .set-input-row input{
+    width:78px;
+    height:54px;
+    text-align:center;
+    font-size:24px;
+    font-weight:800;
+    font-family:inherit;
+    color:var(--primary-dark);
+    background:var(--primary-light);
+    border:2px solid var(--primary);
+    border-radius:14px;
+    outline:none;
+    transition:all .16s;
+    -moz-appearance:textfield;
+  }
+  .set-input-row input::-webkit-outer-spin-button,
+  .set-input-row input::-webkit-inner-spin-button{
+    -webkit-appearance:none;margin:0;
+  }
+  .set-input-row input:focus{
+    background:#fff;
+    box-shadow:0 0 0 4px rgba(42,161,152,.14);
+  }
+  .action-row{display:flex;flex-direction:column;gap:10px}
+  .btn-record{
+    padding:16px;
+    border:none;
+    border-radius:var(--radius-md);
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    font-family:inherit;
+    letter-spacing:.05em;
+    cursor:pointer;
+    box-shadow:var(--shadow-btn);
+    transition:transform .16s;
+  }
+  .btn-record:active{transform:scale(.97)}
+  .btn-finish{
+    padding:16px;
+    border:none;
+    border-radius:var(--radius-md);
+    background:linear-gradient(135deg,#f9b54a 0%,var(--accent-dark) 100%);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    font-family:inherit;
+    letter-spacing:.05em;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(245,166,35,.32);
+    transition:transform .16s;
+  }
+  .btn-finish:active{transform:scale(.97)}
+
+  .list-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text);
+    letter-spacing:.04em;
+    padding:0 4px 10px;
+  }
+  .list-title .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--primary);
+  }
+  .list-title .count-pill{
+    margin-left:auto;
+    font-size:11px;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:var(--primary-light);
+    padding:3px 9px;
+    border-radius:999px;
+  }
+
+  .entry-list{display:flex;flex-direction:column;gap:8px}
+  .entry{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--card);
+    border-radius:var(--radius-md);
+    padding:14px 12px 14px 16px;
+    box-shadow:0 3px 14px rgba(42,161,152,.08);
+    animation:slideIn .26s cubic-bezier(.2,.9,.3,1.1) both;
+    border:1px solid rgba(216,235,230,.7);
+  }
+  @keyframes slideIn{
+    from{opacity:0;transform:translateX(-10px)}
+    to{opacity:1;transform:translateX(0)}
+  }
+  .entry-time{
+    flex-shrink:0;
+    font-size:14px;
+    font-weight:800;
+    color:var(--primary-dark);
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.02em;
+    min-width:48px;
+  }
+  .entry-sep{
+    width:1px;
+    align-self:stretch;
+    background:var(--border);
+    flex-shrink:0;
+  }
+  .entry-detail{
+    flex:1;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    line-height:1.35;
+    min-width:0;
+  }
+  .entry-detail em{
+    font-style:normal;
+    color:var(--accent-dark);
+    font-weight:800;
+  }
+  .entry-del{
+    flex-shrink:0;
+    width:30px;height:30px;
+    border:none;
+    border-radius:50%;
+    background:var(--danger-light);
+    color:var(--danger);
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .16s;
+    font-family:inherit;
+    line-height:1;
+    padding:0;
+  }
+  .entry-del:active{transform:scale(.88);background:var(--danger);color:#fff}
+
+  .empty-hint{
+    text-align:center;
+    font-size:13px;
+    color:var(--text-muted);
+    padding:26px 16px;
+    background:rgba(255,255,255,.55);
+    border-radius:var(--radius-md);
+    border:1.5px dashed var(--border);
+    line-height:1.7;
+  }
+  .empty-hint .big{font-size:30px;display:block;margin-bottom:8px;opacity:.7}
+
+  /* ===== 汇总页 ===== */
+  .summary-list{display:flex;flex-direction:column;gap:14px;margin-bottom:22px}
+  .summary-group{
+    background:var(--card);
+    border-radius:var(--radius-lg);
+    padding:16px 14px 12px;
+    box-shadow:var(--shadow-card);
+    animation:slideIn .26s cubic-bezier(.2,.9,.3,1.1) both;
+  }
+  .sg-head{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:0 4px 11px;
+    border-bottom:1px dashed var(--border);
+    margin-bottom:10px;
+  }
+  .sg-icon{font-size:18px;line-height:1}
+  .sg-name{font-size:16px;font-weight:800;letter-spacing:.02em;flex:1}
+  .sg-total{
+    font-size:12px;
+    font-weight:700;
+    color:var(--accent-dark);
+    background:var(--accent-light);
+    padding:4px 10px;
+    border-radius:999px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .sg-entries{display:flex;flex-direction:column;gap:7px}
+  .sg-entry{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:11px 10px 11px 13px;
+    border-radius:var(--radius-sm);
+    background:linear-gradient(180deg,#f9fdfc 0%,#f4faf8 100%);
+    border:1px solid rgba(216,235,230,.8);
+  }
+  .sge-time{
+    font-size:13px;
+    font-weight:800;
+    color:var(--primary-dark);
+    font-variant-numeric:tabular-nums;
+    min-width:44px;
+    flex-shrink:0;
+  }
+  .sge-text{
+    flex:1;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--text);
+    line-height:1.35;
+    min-width:0;
+  }
+  .sge-text em{font-style:normal;color:var(--accent-dark);font-weight:800}
+  .sge-del{
+    flex-shrink:0;
+    width:26px;height:26px;
+    border:none;
+    border-radius:50%;
+    background:var(--danger-light);
+    color:var(--danger);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .16s;
+    font-family:inherit;
+    line-height:1;
+    padding:0;
+  }
+  .sge-del:active{transform:scale(.88);background:var(--danger);color:#fff}
+
+  .btn-finish-day{
+    width:100%;
+    padding:17px;
+    border:none;
+    border-radius:var(--radius-md);
+    background:linear-gradient(135deg,#57c98f 0%,#2f9e6b 100%);
+    color:#fff;
+    font-size:16.5px;
+    font-weight:800;
+    font-family:inherit;
+    letter-spacing:.06em;
+    cursor:pointer;
+    box-shadow:0 5px 18px rgba(47,158,107,.32);
+    transition:transform .16s;
+    margin-top:auto;
+  }
+  .btn-finish-day:active{transform:scale(.97)}
+  .btn-finish-day:disabled{
+    background:#dfe9e6;
+    color:#9db3ae;
+    box-shadow:none;
+    cursor:not-allowed;
+    transform:none;
+  }
+
+  /* ===== 最终统计页 ===== */
+  .final-inner{
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:30px 18px calc(30px + env(safe-area-inset-bottom));
+    gap:20px;
+  }
+  .final-card{
+    width:100%;
+    max-width:460px;
+    background:linear-gradient(165deg,#ffffff 0%,#f7fdfb 100%);
+    border-radius:26px;
+    padding:30px 22px 26px;
+    box-shadow:0 14px 44px rgba(42,161,152,.18);
+    border:1px solid rgba(216,235,230,.9);
+    animation:cardPop .5s cubic-bezier(.2,.9,.3,1.1) both;
+  }
+  @keyframes cardPop{
+    from{opacity:0;transform:scale(.94) translateY(12px)}
+    to{opacity:1;transform:scale(1) translateY(0)}
+  }
+  .fc-head{text-align:center;padding-bottom:20px}
+  .fc-title{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:.05em;
+    background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    line-height:1.3;
+  }
+  .fc-date{
+    font-size:12.5px;
+    color:var(--text-muted);
+    margin-top:7px;
+    letter-spacing:.08em;
+    font-variant-numeric:tabular-nums;
+  }
+  .fc-divider{
+    height:1px;
+    background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 6px,transparent 6px,transparent 12px);
+    margin:0 0 18px;
+  }
+  .fc-rows{display:flex;flex-direction:column;gap:15px;margin-bottom:20px}
+  .fc-row{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+  }
+  .fc-idx{
+    width:24px;height:24px;
+    flex-shrink:0;
+    margin-top:1px;
+    border-radius:50%;
+    background:var(--primary-light);
+    color:var(--primary-dark);
+    font-size:11.5px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .fc-content{
+    flex:1;
+    min-width:0;
+  }
+  .fc-line{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .fc-name{
+    flex:1;
+    font-size:15.5px;
+    font-weight:700;
+    letter-spacing:.02em;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    min-width:0;
+  }
+  .fc-stat{
+    font-size:13px;
+    font-weight:800;
+    color:var(--accent-dark);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .fc-times{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    margin-top:7px;
+  }
+  .fc-time{
+    font-size:10px;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:var(--primary-light);
+    padding:2px 7px;
+    border-radius:999px;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.02em;
+    line-height:1.6;
+    border:1px solid rgba(42,161,152,.14);
+  }
+  .fc-total-box{
+    background:linear-gradient(135deg,var(--primary-light) 0%,#f0faf8 100%);
+    border-radius:16px;
+    padding:18px 16px;
+    text-align:center;
+    margin-bottom:18px;
+    border:1px solid rgba(42,161,152,.15);
+  }
+  .fct-label{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--primary-dark);
+    letter-spacing:.16em;
+    margin-bottom:8px;
+    opacity:.7;
+  }
+  .fct-value{
+    font-size:17px;
+    font-weight:800;
+    color:var(--primary-dark);
+    letter-spacing:.02em;
+    line-height:1.5;
+    font-variant-numeric:tabular-nums;
+  }
+  .fct-value .hl{color:var(--accent-dark)}
+  .fc-footer{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--text-muted);
+    letter-spacing:.14em;
+    font-weight:600;
+  }
+
+  .final-actions{
+    width:100%;
+    max-width:460px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .btn-final{
+    width:100%;
+    padding:15px;
+    border-radius:var(--radius-md);
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    letter-spacing:.05em;
+    cursor:pointer;
+    transition:transform .16s;
+    border:none;
+  }
+  .btn-final:active{transform:scale(.97)}
+  .btn-final.primary{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+    color:#fff;
+    box-shadow:var(--shadow-btn);
+  }
+  .btn-final.ghost{
+    background:transparent;
+    color:var(--text-muted);
+    border:1.5px solid var(--border);
+  }
+
+  /* ===== Toast ===== */
+  .toast{
+    position:fixed;
+    top:calc(24px + env(safe-area-inset-top));
+    left:50%;
+    transform:translateX(-50%);
+    padding:12px 22px;
+    border-radius:999px;
+    font-size:13.5px;
+    font-weight:600;
+    letter-spacing:.02em;
+    z-index:200;
+    box-shadow:0 8px 24px rgba(0,0,0,.16);
+    white-space:nowrap;
+    max-width:88vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    animation:toastIn .3s cubic-bezier(.2,.9,.3,1.1),toastOut .3s ease 1.6s forwards;
+  }
+  .toast.ok{background:linear-gradient(135deg,#57c98f 0%,#2f9e6b 100%);color:#fff}
+  .toast.warn{background:linear-gradient(135deg,#fbc25e 0%,#e09410 100%);color:#fff}
+  .toast.err{background:linear-gradient(135deg,#ee8272 0%,#c45448 100%);color:#fff}
+  @keyframes toastIn{
+    from{opacity:0;transform:translateX(-50%) translateY(-14px)}
+    to{opacity:1;transform:translateX(-50%) translateY(0)}
+  }
+  @keyframes toastOut{
+    from{opacity:1}
+    to{opacity:0;transform:translateX(-50%) translateY(-8px)}
+  }
+
+  @media(min-width:640px){
+    .home-title{font-size:32px}
+    .exercise-chip{min-height:52px;font-size:15px}
+    .set-input-row input{width:86px;height:58px;font-size:26px}
+  }
+  @media(max-width:380px){
+    .home-title{font-size:24px}
+    .btn-top-summary{font-size:12.5px;padding:8px 12px}
+    .home-inner{padding:24px 14px calc(24px + env(safe-area-inset-bottom))}
+    .page-inner{padding:0 14px calc(28px + env(safe-area-inset-bottom))}
+    .group-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+    .exercise-chip{font-size:13px;min-height:44px;padding:8px 5px}
+    .entry-time{font-size:13px;min-width:42px}
+    .entry-detail{font-size:13px}
+    .fc-name{font-size:14.5px}
+    .fc-stat{font-size:12px}
+    .fc-time{font-size:9.5px;padding:2px 6px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== 首页 ===================== -->
+<div class="screen home active" id="screenHome">
+  <div class="home-inner">
+    <div class="home-header">
+      <div class="header-top">
+        <h1 class="home-title">今天练了什么</h1>
+        <button class="btn-top-summary" id="btnGoSummaryTop" aria-label="查看今日汇总">
+          汇总<span class="badge" id="summaryBadgeTop" style="display:none">0</span>
+        </button>
+      </div>
+      <p class="home-sub">选择动作 · 记录每一组 · 见证坚持</p>
+    </div>
+    <div class="exercise-list" id="exerciseList"></div>
+    <div class="home-footer">
+      <button class="btn-summary" id="btnGoSummary">
+        查看今日汇总<span class="badge" id="summaryBadge" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 动作详情页 ===================== -->
+<div class="screen" id="screenDetail">
+  <div class="page-inner">
+    <div class="page-nav">
+      <button class="btn-back" id="btnBackFromDetail">←</button>
+      <h2 class="page-title" id="detailTitle">动作</h2>
+      <div class="nav-spacer"></div>
+    </div>
+
+    <div class="recorder-card">
+      <div class="recorder-hint">每记录一组，就点一下下面的按钮</div>
+      <div class="set-input-row">
+        <span>做了一组</span>
+        <input type="number" id="repInput" value="12" min="1" max="999" inputmode="numeric">
+        <span>个</span>
+      </div>
+      <div class="action-row">
+        <button class="btn-record" id="btnAddSet">＋ 记录一组</button>
+        <button class="btn-finish" id="btnFinishExercise">做完了 ✓</button>
+      </div>
+    </div>
+
+    <div class="list-title">
+      <span class="dot"></span>
+      本次记录
+      <span class="count-pill" id="pendingCount">0 组</span>
+    </div>
+    <div class="entry-list" id="pendingList"></div>
+  </div>
+</div>
+
+<!-- ===================== 今日汇总页 ===================== -->
+<div class="screen" id="screenSummary">
+  <div class="page-inner">
+    <div class="page-nav">
+      <button class="btn-back" id="btnBackFromSummary">←</button>
+      <h2 class="page-title">今日运动汇总</h2>
+      <div class="nav-spacer"></div>
+    </div>
+    <div class="summary-list" id="summaryList"></div>
+    <button class="btn-finish-day" id="btnFinishDay">今天运动完成 ✓</button>
+  </div>
+</div>
+
+<!-- ===================== 最终统计页 ===================== -->
+<div class="screen" id="screenFinal">
+  <div class="final-inner">
+    <div class="final-card" id="finalCard"></div>
+    <div class="final-actions">
+      <button class="btn-final primary" id="btnBackFinalHome">返回首页继续</button>
+      <button class="btn-final ghost" id="btnResetAll">开始新的一天（清空数据）</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============================================================
+     ①  配置区：在这里自由增删动作
+     ============================================================ */
+  var EXERCISE_GROUPS = [
+    {
+      name:'胸部', icon:'🏋️',
+      exercises:['俯卧撑','宽距俯卧撑','上斜俯卧撑','跪姿俯卧撑','杠铃卧推','哑铃卧推','哑铃飞鸟']
+    },
+    {
+      name:'背部', icon:'🧗',
+      exercises:['引体向上','哑铃划船','超人式','反向飞鸟','俯身划船']
+    },
+    {
+      name:'腿部', icon:'🦵',
+      exercises:['深蹲','箭步蹲','臀桥','靠墙静蹲','提踵','相扑深蹲']
+    },
+    {
+      name:'手臂', icon:'💪',
+      exercises:['哑铃弯举','锤式弯举','窄距俯卧撑','臂屈伸','俯身臂屈伸']
+    },
+    {
+      name:'核心', icon:'🔥',
+      exercises:['仰卧起坐','卷腹','平板支撑','俄罗斯转体','登山跑','死虫式','臀桥卷腹']
+    },
+    {
+      name:'肩部', icon:'🤸',
+      exercises:['哑铃推举','侧平举','俯身飞鸟','前平举']
+    },
+    {
+      name:'有氧', icon:'🏃',
+      exercises:['开合跳','高腿跳','波比跳','跳绳','原地跑']
+    }
+  ];
+
+  var STORAGE_KEY = '__workout_today_v2';
+
+  /* ============================================================
+     ②  状态与工具
+     ============================================================ */
+  var state = {
+    date: dateKey(),
+    pending: {},   // { 动作名: [ {time, count} ] }
+    summary: []    // [ {exercise, time, count, sets} ]
+  };
+
+  var currentExercise = '';
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  function dateKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  }
+
+  function fmtTime(ts){
+    var d = new Date(ts);
+    var p = function(n){ return n < 10 ? '0' + n : '' + n; };
+    return p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function fmtDateCN(){
+    var d = new Date();
+    var week = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][d.getDay()];
+    return d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 ' + week;
+  }
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(!data || typeof data !== 'object') return;
+      if(data.date !== dateKey()) return;
+      state.date = data.date || dateKey();
+      state.pending = (data.pending && typeof data.pending === 'object') ? data.pending : {};
+      state.summary = Array.isArray(data.summary) ? data.summary.filter(function(it){
+        return it && typeof it.exercise === 'string' && it.exercise;
+      }) : [];
+    }catch(e){}
+  }
+
+  function toast(msg, type){
+    type = type || 'ok';
+    var el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 1950);
+  }
+
+  function showScreen(id){
+    var el = $(id);
+    el.classList.add('active');
+    el.scrollTop = 0;
+  }
+  function hideScreen(id){
+    $(id).classList.remove('active');
+  }
+
+  /* ============================================================
+     ③  首页
+     ============================================================ */
+  function renderHome(){
+    var host = $('exerciseList');
+    var html = '';
+
+    EXERCISE_GROUPS.forEach(function(group){
+      html += '<div class="group-block">';
+      html += '<div class="group-header">';
+      html +=   '<span class="group-icon">' + group.icon + '</span>';
+      html +=   '<span class="group-name">' + esc(group.name) + '</span>';
+      html +=   '<span class="group-count">' + group.exercises.length + ' 个动作</span>';
+      html += '</div>';
+      html += '<div class="group-grid">';
+      group.exercises.forEach(function(name){
+        var hasPending = state.pending[name] && state.pending[name].length > 0;
+        html += '<button class="exercise-chip' + (hasPending ? ' has-pending' : '') +
+                '" data-ex="' + esc(name) + '">' + esc(name) + '</button>';
+      });
+      html += '</div></div>';
+    });
+
+    host.innerHTML = html;
+
+    host.querySelectorAll('.exercise-chip').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        openExercise(btn.getAttribute('data-ex'));
+      });
+    });
+
+    updateSummaryBadge();
+  }
+
+  function updateSummaryBadge(){
+    var total = countSummarySets();
+    var badge = $('summaryBadge');
+    var badgeTop = $('summaryBadgeTop');
+
+    if(total > 0){
+      if(badge){
+        badge.style.display = '';
+        badge.textContent = total + ' 组';
+      }
+      if(badgeTop){
+        badgeTop.style.display = '';
+        badgeTop.textContent = total;
+      }
+    } else {
+      if(badge) badge.style.display = 'none';
+      if(badgeTop) badgeTop.style.display = 'none';
+    }
+  }
+
+  function countSummarySets(){
+    var n = 0;
+    state.summary.forEach(function(it){ n += (it.sets || 0); });
+    return n;
+  }
+
+  function esc(str){
+    var d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+  /* ============================================================
+     ④  动作详情页
+     ============================================================ */
+  function openExercise(name){
+    currentExercise = name;
+    $('detailTitle').textContent = name;
+
+    var input = $('repInput');
+    if(!input.value || parseInt(input.value, 10) <= 0){
+      input.value = 12;
+    }
+
+    renderPending();
+    showScreen('screenDetail');
+  }
+
+  function renderPending(){
+    var list = state.pending[currentExercise] || [];
+    var host = $('pendingList');
+    var countPill = $('pendingCount');
+
+    countPill.textContent = list.length + ' 组';
+
+    if(list.length === 0){
+      host.innerHTML = '<div class="empty-hint"><span class="big">📝</span>还没有记录任何组<br>输入次数后点「记录一组」开始吧</div>';
+      return;
+    }
+
+    var html = '';
+    list.forEach(function(item, idx){
+      html += '<div class="entry" style="animation-delay:' + (idx * 30) + 'ms">';
+      html +=   '<div class="entry-time">' + fmtTime(item.time) + '</div>';
+      html +=   '<div class="entry-sep"></div>';
+      html +=   '<div class="entry-detail">做了 <em>' + item.count + '</em> 个</div>';
+      html +=   '<button class="entry-del" data-idx="' + idx + '" aria-label="删除">✕</button>';
+      html += '</div>';
+    });
+    host.innerHTML = html;
+
+    host.querySelectorAll('.entry-del').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = parseInt(btn.getAttribute('data-idx'), 10);
+        deletePending(i);
+      });
+    });
+  }
+
+  function addSet(){
+    var input = $('repInput');
+    var count = parseInt(input.value, 10);
+    if(!count || count <= 0){
+      toast('请先输入每组个数', 'warn');
+      input.focus();
+      return;
+    }
+    if(count > 999) count = 999;
+
+    if(!state.pending[currentExercise]){
+      state.pending[currentExercise] = [];
+    }
+    var list = state.pending[currentExercise];
+
+    list.push({
+      time: Date.now(),
+      count: count
+    });
+
+    save();
+    renderPending();
+    renderHome();
+
+    if(navigator.vibrate) navigator.vibrate(12);
+    toast('已记录：' + count + ' 个 · 共 ' + list.length + ' 组', 'ok');
+  }
+
+  function deletePending(idx){
+    var list = state.pending[currentExercise];
+    if(!list || idx < 0 || idx >= list.length) return;
+    list.splice(idx, 1);
+    if(list.length === 0) delete state.pending[currentExercise];
+    save();
+    renderPending();
+    renderHome();
+    toast('已删除该记录', 'warn');
+  }
+
+  function finishExercise(){
+    var list = state.pending[currentExercise];
+    if(!list || list.length === 0){
+      toast('还没有记录任何组哦', 'warn');
+      return;
+    }
+
+    list.forEach(function(item){
+      state.summary.push({
+        exercise: currentExercise,
+        time: item.time,
+        count: item.count,
+        sets: 1
+      });
+    });
+
+    delete state.pending[currentExercise];
+    save();
+
+    renderHome();
+    renderPending();
+    updateSummaryBadge();
+
+    toast('「' + currentExercise + '」已记入今日汇总 ✓', 'ok');
+    hideScreen('screenDetail');
+  }
+
+  /* ============================================================
+     ⑤  今日汇总页
+     ============================================================ */
+  function renderSummary(){
+    var host = $('summaryList');
+
+    if(state.summary.length === 0){
+      host.innerHTML = '<div class="empty-hint"><span class="big">🏃</span>今天还没有完成的动作<br>回到首页，选一个动作开始吧</div>';
+      $('btnFinishDay').disabled = true;
+      return;
+    }
+
+    var order = [];
+    var grouped = {};
+    state.summary.forEach(function(item, idx){
+      if(!grouped[item.exercise]){
+        grouped[item.exercise] = [];
+        order.push(item.exercise);
+      }
+      grouped[item.exercise].push({ item: item, idx: idx });
+    });
+
+    var html = '';
+    order.forEach(function(name){
+      var entries = grouped[name];
+      var totalSets = 0, totalReps = 0;
+      entries.forEach(function(e){
+        totalSets += e.item.sets;
+        totalReps += e.item.sets * e.item.count;
+      });
+
+      html += '<div class="summary-group">';
+      html +=   '<div class="sg-head">';
+      html +=     '<span class="sg-icon">' + groupIconOf(name) + '</span>';
+      html +=     '<span class="sg-name">' + esc(name) + '</span>';
+      html +=     '<span class="sg-total">' + totalSets + '组 · ' + totalReps + '个</span>';
+      html +=   '</div>';
+      html +=   '<div class="sg-entries">';
+      entries.forEach(function(e){
+        html += '<div class="sg-entry">';
+        html +=   '<span class="sge-time">' + fmtTime(e.item.time) + '</span>';
+        html +=   '<span class="sge-text">做了 <em>' + e.item.count + '</em> 个</span>';
+        html +=   '<button class="sge-del" data-idx="' + e.idx + '" aria-label="删除">✕</button>';
+        html += '</div>';
+      });
+      html +=   '</div>';
+      html += '</div>';
+    });
+
+    host.innerHTML = html;
+    $('btnFinishDay').disabled = false;
+
+    host.querySelectorAll('.sge-del').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = parseInt(btn.getAttribute('data-idx'), 10);
+        deleteSummary(i);
+      });
+    });
+  }
+
+  function groupIconOf(name){
+    for(var i=0;i<EXERCISE_GROUPS.length;i++){
+      if(EXERCISE_GROUPS[i].exercises.indexOf(name) !== -1){
+        return EXERCISE_GROUPS[i].icon;
+      }
+    }
+    return '💪';
+  }
+
+  function deleteSummary(idx){
+    if(idx < 0 || idx >= state.summary.length) return;
+    var removed = state.summary[idx];
+    state.summary.splice(idx, 1);
+    save();
+    renderSummary();
+    renderHome();
+    updateSummaryBadge();
+    toast('已删除：' + removed.exercise + ' 1组', 'warn');
+  }
+
+  /* ============================================================
+     ⑥  最终统计页 —— 含每组时间
+     ============================================================ */
+  function renderFinal(){
+    var host = $('finalCard');
+
+    if(state.summary.length === 0){
+      host.innerHTML = '<div class="empty-hint"><span class="big">🤔</span>还没有数据<br>先去练几组吧！</div>';
+      return;
+    }
+
+    /* 按动作聚合：sets / reps / 每组时间列表 */
+    var order = [];
+    var agg = {};
+    state.summary.forEach(function(item){
+      if(!agg[item.exercise]){
+        agg[item.exercise] = { sets: 0, reps: 0, times: [] };
+        order.push(item.exercise);
+      }
+      var a = agg[item.exercise];
+      a.sets += item.sets;
+      a.reps += item.sets * item.count;
+      // 每条 item 通常代表 1 组；兼容旧数据 sets>1
+      if(item.sets === 1){
+        a.times.push(item.time);
+      } else {
+        for(var i=0;i<item.sets;i++) a.times.push(item.time);
+      }
+    });
+
+    // 时间排序（升序）
+    order.forEach(function(n){
+      agg[n].times.sort(function(a,b){ return a - b; });
+    });
+
+    var totalSets = 0, totalReps = 0;
+    order.forEach(function(n){
+      totalSets += agg[n].sets;
+      totalReps += agg[n].reps;
+    });
+
+    var html = '';
+    html += '<div class="fc-head">';
+    html +=   '<div class="fc-title">今天练了什么</div>';
+    html +=   '<div class="fc-date">' + fmtDateCN() + '</div>';
+    html += '</div>';
+    html += '<div class="fc-divider"></div>';
+
+    html += '<div class="fc-rows">';
+    order.forEach(function(name, i){
+      html += '<div class="fc-row">';
+      html +=   '<div class="fc-idx">' + (i+1) + '</div>';
+      html +=   '<div class="fc-content">';
+      html +=     '<div class="fc-line">';
+      html +=       '<span class="fc-name">' + esc(name) + '</span>';
+      html +=       '<span class="fc-stat">' + agg[name].sets + '组 · ' + agg[name].reps + '个</span>';
+      html +=     '</div>';
+      // 每一组的时间标签
+      html +=     '<div class="fc-times">';
+      agg[name].times.forEach(function(ts){
+        html += '<span class="fc-time">' + fmtTime(ts) + '</span>';
+      });
+      html +=     '</div>';
+      html +=   '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="fc-total-box">';
+    html +=   '<div class="fct-label">今 日 合 计</div>';
+    html +=   '<div class="fct-value">' +
+                  order.length + ' 个动作 · ' +
+                  '<span class="hl">' + totalSets + '</span> 组 · ' +
+                  '<span class="hl">' + totalReps + '</span> 个' +
+              '</div>';
+    html += '</div>';
+
+    html += '<div class="fc-footer">坚 持 就 是 胜 利 💪</div>';
+
+    host.innerHTML = html;
+  }
+
+  /* ============================================================
+     ⑦  事件绑定
+     ============================================================ */
+  // 顶部小按钮
+  $('btnGoSummaryTop').addEventListener('click', function(){
+    renderSummary();
+    showScreen('screenSummary');
+  });
+  // 底部大按钮
+  $('btnGoSummary').addEventListener('click', function(){
+    renderSummary();
+    showScreen('screenSummary');
+  });
+
+  $('btnBackFromDetail').addEventListener('click', function(){
+    hideScreen('screenDetail');
+    renderHome();
+  });
+
+  $('btnAddSet').addEventListener('click', addSet);
+
+  $('btnFinishExercise').addEventListener('click', finishExercise);
+
+  $('repInput').addEventListener('focus', function(){ this.select(); });
+  $('repInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); addSet(); this.blur(); }
+  });
+
+  $('btnBackFromSummary').addEventListener('click', function(){
+    hideScreen('screenSummary');
+    renderHome();
+  });
+
+  $('btnFinishDay').addEventListener('click', function(){
+    if(state.summary.length === 0){
+      toast('还没有可汇总的内容', 'warn');
+      return;
+    }
+    renderFinal();
+    showScreen('screenFinal');
+  });
+
+  $('btnBackFinalHome').addEventListener('click', function(){
+    hideScreen('screenFinal');
+    renderHome();
+  });
+
+  $('btnResetAll').addEventListener('click', function(){
+    if(!confirm('确定要清空今天的所有记录吗？此操作不可恢复。')) return;
+    state.date = dateKey();
+    state.pending = {};
+    state.summary = [];
+    save();
+    renderHome();
+    renderPending();
+    updateSummaryBadge();
+    hideScreen('screenFinal');
+    toast('已清空，开始新的一天！', 'ok');
+  });
+
+  /* ============================================================
+     ⑧  初始化
+     ============================================================ */
+  load();
+  renderHome();
+  updateSummaryBadge();
+
+})();
+</script>
+</body>
+</html>
