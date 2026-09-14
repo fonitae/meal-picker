@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>我的小工具</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+    background:linear-gradient(165deg,#f0faf7 0%,#ddf2ec 50%,#fde0c0 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 20px;
+    color:#1f3d38;
+  }
+  .wrap{width:100%;max-width:420px}
+  .title{
+    text-align:center;
+    font-size:26px;
+    font-weight:800;
+    margin-bottom:6px;
+    letter-spacing:.04em;
+    background:linear-gradient(135deg,#1e7a73 0%,#2aa198 60%,#e8953a 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .sub{
+    text-align:center;
+    font-size:13px;
+    color:#7a9a92;
+    margin-bottom:28px;
+    letter-spacing:.06em;
+  }
+  .card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#fff;
+    border-radius:20px;
+    padding:20px 18px;
+    margin-bottom:14px;
+    box-shadow:0 8px 26px rgba(42,161,152,.14);
+    text-decoration:none;
+    color:inherit;
+    transition:transform .16s,box-shadow .16s;
+    border:1.5px solid transparent;
+  }
+  .card:active{transform:scale(.97)}
+  .card.meal{border-color:#fcd0a0}
+  .card.meal .icon{background:linear-gradient(135deg,#ffe7c4 0%,#fcd0a0 100%)}
+  .card.workout{border-color:#a8e0d6}
+  .card.workout .icon{background:linear-gradient(135deg,#c8f0ea 0%,#a8e0d6 100%)}
+  .icon{
+    width:56px;height:56px;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    flex-shrink:0;
+  }
+  .info{flex:1;min-width:0}
+  .name{
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:.02em;
+    margin-bottom:4px;
+  }
+  .card.meal .name{color:#c47820}
+  .card.workout .name{color:#1e7a73}
+  .desc{
+    font-size:12.5px;
+    color:#7a9a92;
+    letter-spacing:.02em;
+    line-height:1.4;
+  }
+  .arrow{
+    font-size:20px;
+    color:#b5cec8;
+    flex-shrink:0;
+    transition:transform .16s;
+  }
+  .card:active .arrow{transform:translateX(4px)}
+  .footer{
+    text-align:center;
+    font-size:11.5px;
+    color:#a0b8b2;
+    margin-top:22px;
+    letter-spacing:.08em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">我的小工具</h1>
+  <p class="sub">点开即用 · 无需登录 · 数据存手机</p>
+
+  <a class="card meal" href="./meal/">
+    <div class="icon">🍽️</div>
+    <div class="info">
+      <div class="name">今天吃什么</div>
+      <div class="desc">随机帮你决定，告别选择困难</div>
+    </div>
+    <div class="arrow">→</div>
+  </a>
+
+  <a class="card workout" href="./workout/">
+    <div class="icon">💪</div>
+    <div class="info">
+      <div class="name">今天练了什么</div>
+      <div class="desc">记录每一组，见证坚持</div>
+    </div>
+    <div class="arrow">→</div>
+  </a>
+
+  <p class="footer">把喜欢的页面「添加到主屏幕」更方便</p>
+</div>
+</body>
+</html>
