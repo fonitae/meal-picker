@@ -1124,5 +1124,36 @@
             updateMenuButton();
         })();
     </script>
+    <!-- ==== 返回首页悬浮按钮 ==== -->
+    <a href="../" class="back-home-btn" aria-label="返回首页">
+      <span>🏠</span>
+    </a>
+    <style>
+      .back-home-btn{
+        position:fixed;
+        right:16px;
+        bottom:calc(20px + env(safe-area-inset-bottom));
+        width:48px;
+        height:48px;
+        border-radius:50%;
+        background:rgba(255,255,255,.95);
+        color:#3d2e1f;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:22px;
+        text-decoration:none;
+        box-shadow:0 6px 20px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.05);
+        z-index:500;
+        transition:transform .16s,background .16s;
+        -webkit-tap-highlight-color:transparent;
+        backdrop-filter:blur(6px);
+        -webkit-backdrop-filter:blur(6px);
+      }
+      .back-home-btn:active{
+        transform:scale(.9);
+        background:rgba(240,240,240,.98);
+      }
+    </style>
 </body>
 </html>
